@@ -36,18 +36,10 @@ class User(db.Model):
 
     image_url = db.Column(
         db.Text,
-        default=DEFAULT_IMAGE_URL,
+        default=DEFAULT_USER_IMAGE_URL,
     )
 
-    header_image_url = db.Column(
-        db.Text,
-        default=DEFAULT_HEADER_IMAGE_URL,
-    )
-
-    bio = db.Column(
-        db.Text,
-    )
-
+  
     location = db.Column(
         db.Text,
     )
@@ -56,6 +48,20 @@ class User(db.Model):
         db.Text,
         nullable=False,
     )
+
+    reserved_pools = db.relationship(
+        'Pools',
+        secondary='owner',
+        backref='booker'
+    )
+
+    owned_pools = db.relationship(
+        'Pools',
+        secondary='booker',
+        backref='owner'
+    )
+
+
 
 def __repr__(self):
         return f"<User #{self.id}: {self.username}, {self.email}>"
@@ -103,6 +109,66 @@ def __repr__(self):
 
 # POOLS
 
+class Pool(db.Model):
+""" Pool in the system """
+
+    __tablename__ = 'pools'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+    )
+
+    rate = db.Column(
+        db.Number,
+        nullable=false
+    )
+
+    size = db.Column(
+        db.Text,
+        nullable=false,
+    )
+
+    description = db.Column(
+        db.Text,
+        nullable=false,
+    )
+
+    address = db.Column(
+        db.Text,
+        nullable=false,
+    )
+
+    image_url = db.Column(
+        db.Text,
+        default=DEFAULT_POOL_IMAGE_URL,
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id"),
+        nullable=False,
+    )
+
+class Reservation(db.Model):
+    """ Connection of a User and Pool that they reserve """
+
+    __tablename__ = "reservations"
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id", ondelete="CASCADE"),
+        primary_key=True
+    )
+    pool_id = db.Column(
+        db.Integer,
+        db.ForeignKey("pools.id", ondelete="CASCADE"),
+        primary_key=True
+    )
+    date = db.Column(
+        db.DateTime,
+        nullable=False,
+    )
 
 
 # db
