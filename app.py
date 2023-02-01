@@ -33,9 +33,6 @@ app.config["JWT_IDENTITY_CLAIM"] = "username"
 
 
 
-
-
-
 connect_db(app)
 db.create_all()
 
@@ -89,16 +86,7 @@ def create_user():
         email=data['email'],
         location=data['location'],
     )
-    # user = User(
-    #     email=data['email'],
-    #     username=data['username'],
-    #     password=data['password'],
-    #     location=data['location'],
-    #     )
 
-
-
-    # db.session.add(user)
     db.session.commit()
 
     return (jsonify(user=user.serialize()), 201)
@@ -123,47 +111,55 @@ def list_users():
 
 
 # // TODO: read specific user
-@app.get('/users/<int:user_id>')
-def show_user(user_id):
+@app.get('/api/users/<username>')
+def show_user(username):
     """Show user profile.
 
     Returns JSON like:
         {user: id, email, username, image_url, location, reserved_pools, owned_pools}
     """
-    user = User.query.get_or_404(user_id)
+    user = User.query.get_or_404(username)
     user = user.serialize()
 
     return jsonify(user=user)
 
 
-# create user
+# // TODO: update user
+@app.patch('/api/users/<username>')
+def update_user(username):
+    """ update user information
 
-    # POST requests should return HTTP status of 201 CREATED
-    # return (res)
+    Returns JSON like:
+        {user: id, email, username, image_url, location, reserved_pools, owned_pools}
+    """
+
+    user = User.query.get_or_404(username)
+    print("user", user)
+    data = request.json
+
+    user.username = data['username'],
+    # TODO: ADD "CHANGE PASSWORD FEATURE LATER"
+    user.email = data['email'],
+    user.location = data['location'],
+
+    db.session.add(user)
+    db.session.commit()
+
+    return (jsonify(user=user.serialize()), 200)
 
 
-    # TODO: update user
 
+# // TODO: delete user
+@app.delete('/api/users/delete/<username>')
+def delete_user(username):
+    """Delete user. """
 
+    user = User.query.get_or_404(username)
 
-    # TODO: delete user
-# @app.post('/users/delete')
-# def delete_user():
-#     """Delete user.
+    db.session.delete(user)
+    db.session.commit()
 
-#     Redirect to signup page.
-#     """
-
-#     # if not g.user:
-#     #     flash("Access unauthorized.", "danger")
-#     #     return redirect("/")
-
-#     # do_logout()
-
-#     db.session.delete(g.user)
-#     db.session.commit()
-
-#     return redirect("/signup")
+    return jsonify("User successfully deleted", 200)
 
 
 ########################  USERS ENDPOINTS END  #################################
