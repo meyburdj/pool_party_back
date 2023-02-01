@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify
 from models import db, connect_db, User, Message, Pool, Availability, Reservation
 from sqlalchemy.exc import IntegrityError
 import boto3
+from werkzeug.utils import secure_filename
 
 load_dotenv()
 
@@ -17,15 +18,15 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
-app.config['aws_access_key_id'] = os.environ['aws_access_key_id']
-app.config['aws_secret_access_key'] = os.environ['aws_secret_access_key']
-app.config['aws_session_token'] = os.environ['aws_session_token']
+aws_access_key_id = os.environ['aws_access_key_id']
+aws_secret_access_key = os.environ['aws_secret_access_key']
+# app.config['aws_session_token'] = os.environ['aws_session_token']
 
 
 s3 = boto3.client('s3',
                     aws_access_key_id,
                     aws_secret_access_key,
-                    aws_session_token
+                    # aws_session_token
                      )
 BUCKET_NAME='sharebnb-gmm'
 
@@ -57,12 +58,26 @@ def create_user():
 
     data = request.json
     print("data", data)
+
+    img = data['image_url']
+    if data['image_url']:
+        filename = secure_filename(img.filename)
+        img.save(filename)
+        s3.upload_file(
+            Bucket = BUCKET_NAME,
+            Filename=filename,
+            Key = filename
+        )
+
+
     user = User(
         email=data['email'],
         username=data['username'],
         password=data['password'],
         location=data['location'],
         image_url=data['image_url'] or None)
+
+
 
     db.session.add(user)
     db.session.commit()

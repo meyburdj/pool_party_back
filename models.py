@@ -19,9 +19,11 @@ class User(db.Model):
 
     __tablename__ = 'users'
 
-    id = db.Column(
-        db.Integer,
-        primary_key=True,
+    username = db.Column(
+        db.Text,
+        nullable=False,
+        unique=True,
+        primary_key=True
     )
 
     email = db.Column(
@@ -29,18 +31,6 @@ class User(db.Model):
         nullable=False,
         unique=True,
     )
-
-    username = db.Column(
-        db.Text,
-        nullable=False,
-        unique=True,
-    )
-
-    image_url = db.Column(
-        db.Text,
-        default=DEFAULT_USER_IMAGE_URL,
-    )
-
 
     location = db.Column(
         db.Text,
@@ -66,10 +56,8 @@ class User(db.Model):
     def serialize(self):
         """ returns self """
         return {
-            "id" : self.id,
-            "email" : self.email,
             "username" : self.username,
-            "image_url" : self.image_url,
+            "email" : self.email,
             "location" : self.location,
             # "reserved_pools" : self.reserved_pools,
             # "owned_pools" : self.owned_pools
@@ -132,16 +120,16 @@ class Message(db.Model):
     )
 
     # userid to
-    sender_id = db.Column(
-        db.Integer,
-        db.ForeignKey('users.id'),
+    sender_username = db.Column(
+        db.Text,
+        db.ForeignKey('users.username'),
         nullable=False
     )
 
     # userid from
-    recipient_id = db.Column(
-        db.Integer,
-        db.ForeignKey('users.id'),
+    recipient_username = db.Column(
+        db.Text,
+        db.ForeignKey('users.username'),
         nullable=False
     )
 
@@ -162,8 +150,8 @@ class Message(db.Model):
         """ returns self """
         return {
             "id" : self.id,
-            "user_id_to" : self.user_id_to,
-            "user_id_from" : self.user_id_from,
+            "sender_username" : self.sender_username,
+            "recipient_username" : self.recipient_username,
             "text" : self.text,
             "timestamp" : self.timestamp
         }
@@ -181,9 +169,9 @@ class Pool(db.Model):
         primary_key=True,
     )
 
-    owner_id = db.Column(
-        db.Integer,
-        db.ForeignKey("users.id"),
+    owner_username = db.Column(
+        db.text,
+        db.ForeignKey("users.username"),
         nullable=False,
     )
 
@@ -207,10 +195,6 @@ class Pool(db.Model):
         nullable=False,
     )
 
-    image_url = db.Column(
-        db.Text,
-        default=DEFAULT_POOL_IMAGE_URL,
-    )
 
     def serialize(self):
         """ returns self """
@@ -221,7 +205,6 @@ class Pool(db.Model):
             "size" : self.size,
             "description" : self.description,
             "address" : self.address,
-            "image_url" : self.image_url,
         }
 
 
@@ -250,17 +233,26 @@ class Reservation(db.Model):
 
     __tablename__ = "reservations"
 
-
-    user_id = db.Column(
+    reservation_id = db.Column(
         db.Integer,
-        db.ForeignKey("users.id", ondelete="CASCADE"),
         primary_key=True
     )
+
+    username = db.Column(
+        db.Text,
+        db.ForeignKey("users.username", ondelete="CASCADE"),
+    )
+
     pool_id = db.Column(
         db.Integer,
         db.ForeignKey("pools.id", ondelete="CASCADE"),
-        primary_key=True
     )
+
+    reservation_date_created = db.Column(
+        db.DateTime,
+        nullable=False
+    )
+
     start_date = db.Column(
         db.DateTime,
         nullable=False,
@@ -274,10 +266,50 @@ class Reservation(db.Model):
         """ returns self """
         return {
             "id" : self.id,
-            "user_id" : self.user_id,
+            "username" : self.username,
             "pool_id" : self.pool_id,
-            "date" : self.date,
+            "reservation_date_created" : self.reservation_date_created,
+            "start_date" : self.start_date,
+            "end_date" : self.end_date,
         }
+
+class UserImage(db.model):
+    """ Connection from the user to their profile image. """
+
+    __tablename__ = "user_images"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id", ondelete="CASCADE"),
+    )
+
+    image_path = db.Column(
+        db.Text(),
+        nullable = False
+    )
+
+class PoolImage(db.model):
+    """ Connection from the pool to ITS. """
+
+    __tablename__ = "pool_images"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    pool_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id", ondelete="CASCADE"),
+    )
+
+    image_path = db.Column(
+        db.Text(),
+        nullable = False
+    )
 
 
 
