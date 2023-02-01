@@ -3,13 +3,13 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from models import db, connect_db, User, Message, Pool, Availability, Reservation
 from sqlalchemy.exc import IntegrityError
-import boto3
-from werkzeug.utils import secure_filename
+
+from api_helpers import upload_to_aws
+
 
 load_dotenv()
 
 app = Flask(__name__)
-bucket_base_url = "https://sharebnb-gmm.s3.us-west-1.amazonaws.com/"
 
 # Get DB_URI from environ variable (useful for production/testing) or,
 # if not set there, use development local db.
@@ -19,13 +19,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
-aws_access_key_id = os.environ['aws_access_key_id']
-aws_secret_access_key = os.environ['aws_secret_access_key']
-# app.config['aws_session_token'] = os.environ['aws_session_token']
 
 
-s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
-BUCKET_NAME='sharebnb-gmm'
+
+
 
 connect_db(app)
 db.create_all()
@@ -106,23 +103,23 @@ def create_user():
 
 
     # TODO: delete user
-    @app.post('/users/delete')
-def delete_user():
-    """Delete user.
+# @app.post('/users/delete')
+# def delete_user():
+#     """Delete user.
 
-    Redirect to signup page.
-    """
+#     Redirect to signup page.
+#     """
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+#     # if not g.user:
+#     #     flash("Access unauthorized.", "danger")
+#     #     return redirect("/")
 
-    do_logout()
+#     # do_logout()
 
-    db.session.delete(g.user)
-    db.session.commit()
+#     db.session.delete(g.user)
+#     db.session.commit()
 
-    return redirect("/signup")
+#     return redirect("/signup")
 
 
 ########################  USERS ENDPOINTS END  #################################
@@ -193,25 +190,9 @@ def add_pool_image():
     """
 
     file = request.files['file']
-    print("file.filename: ", file.filename)
-    print("file: ", file)
-
-    # content = file.read()
 
     if file:
-        filename = secure_filename(file.filename)
-        file.save(filename)
-
-        s3.upload_file(
-            Bucket = BUCKET_NAME,
-            Filename=filename,
-            ExtraArgs={"ContentType": "mimetype"},
-            Key = filename
-        )
-        url = f"{bucket_base_url}{filename}"
-
-        # TODO: refactor this later so it doesnt have to save to os.
-        os.remove(filename)
+        url = upload_to_aws(file)
 
         return url
 
