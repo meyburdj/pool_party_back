@@ -170,7 +170,7 @@ class Pool(db.Model):
     )
 
     owner_username = db.Column(
-        db.text,
+        db.Text,
         db.ForeignKey("users.username"),
         nullable=False,
     )
@@ -273,8 +273,8 @@ class Reservation(db.Model):
             "end_date" : self.end_date,
         }
 
-class UserImage(db.model):
-    """ Connection from the user to their profile image. """
+class UserImage(db.Model):
+    """ Connection from the user to their profile images. """
 
     __tablename__ = "user_images"
 
@@ -282,18 +282,18 @@ class UserImage(db.model):
         db.Integer,
         primary_key=True
     )
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey("users.id", ondelete="CASCADE"),
+    username = db.Column(
+        db.Text,
+        db.ForeignKey("users.username", ondelete="CASCADE"),
     )
 
     image_path = db.Column(
-        db.Text(),
+        db.Text,
         nullable = False
     )
 
-class PoolImage(db.model):
-    """ Connection from the pool to ITS. """
+class PoolImage(db.Model):
+    """ One to many table connecting a pool to many image paths """
 
     __tablename__ = "pool_images"
 
@@ -301,13 +301,13 @@ class PoolImage(db.model):
         db.Integer,
         primary_key=True
     )
-    pool_id = db.Column(
-        db.Integer,
-        db.ForeignKey("users.id", ondelete="CASCADE"),
+    pool_owner = db.Column(
+        db.Text,
+        db.ForeignKey("users.username", ondelete="CASCADE"),
     )
 
     image_path = db.Column(
-        db.Text(),
+        db.Text,
         nullable = False
     )
 

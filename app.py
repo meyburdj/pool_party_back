@@ -5,10 +5,12 @@ from models import db, connect_db, User, Message, Pool, Availability, Reservatio
 from sqlalchemy.exc import IntegrityError
 import boto3
 from werkzeug.utils import secure_filename
+from slugify import slugify
 
 load_dotenv()
 
 app = Flask(__name__)
+bucket_base_url = "https://sharebnb-gmm.s3.us-west-1.amazonaws.com/"
 
 # Get DB_URI from environ variable (useful for production/testing) or,
 # if not set there, use development local db.
@@ -23,11 +25,7 @@ aws_secret_access_key = os.environ['aws_secret_access_key']
 # app.config['aws_session_token'] = os.environ['aws_session_token']
 
 
-s3 = boto3.client('s3',
-                    aws_access_key_id,
-                    aws_secret_access_key,
-                    # aws_session_token
-                     )
+s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
 BUCKET_NAME='sharebnb-gmm'
 
 connect_db(app)
@@ -62,28 +60,30 @@ def create_user():
     img = data['image_url']
     if data['image_url']:
         filename = secure_filename(img.filename)
+        print("filename", filename)
         img.save(filename)
-        s3.upload_file(
+        res = s3.upload_file(
             Bucket = BUCKET_NAME,
             Filename=filename,
             Key = filename
         )
+        
 
 
-    user = User(
-        email=data['email'],
-        username=data['username'],
-        password=data['password'],
-        location=data['location'],
-        image_url=data['image_url'] or None)
+    # user = User(
+    #     email=data['email'],
+    #     username=data['username'],
+    #     password=data['password'],
+    #     location=data['location'],
+    #     image_url=data['image_url'] or None)
 
 
 
-    db.session.add(user)
-    db.session.commit()
+    # db.session.add(user)
+    # db.session.commit()
 
     # POST requests should return HTTP status of 201 CREATED
-    return (jsonify(user=user.serialize()), 201)
+    return (res)
 
 
 ########################  USERS ENDPOINTS END  #################################
@@ -133,3 +133,42 @@ def create_pool():
 
 
 ########################  USERS ENDPOINTS END  #################################
+
+@app.post("/api/pools/images")
+def add_pool_image():
+    """Add user, and return data about new user.
+
+    Returns JSON like:
+        {user: {id, email, username, image_url, location, reserved_pools, owned_pools}}
+    """
+
+    file = request.files['file']
+    print("file.filename", file.filename)
+    if file:
+        filename = secure_filename(file.filename)
+        file.save(filename)
+        s3.upload_file(
+            Bucket = BUCKET_NAME,
+            Filename=filename,
+            ExtraArgs={"ContentType": "mimetype"},
+            Key = filename
+        )
+        url = f"{bucket_base_url}{filename}"
+
+        return url
+
+
+    # user = User(
+    #     email=data['email'],
+    #     username=data['username'],
+    #     password=data['password'],
+    #     location=data['location'],
+    #     image_url=data['image_url'] or None)
+
+
+
+    # db.session.add(user)
+    # db.session.commit()
+
+    # # POST requests should return HTTP status of 201 CREATED
+    # return (jsonify(user=user.serialize()), 201)
