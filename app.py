@@ -3,6 +3,10 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from models import db, connect_db, User, Message, Pool, Availability, Reservation
 from sqlalchemy.exc import IntegrityError
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+from flask_jwt_extended import JWTManager
 
 from api_helpers import upload_to_aws
 
@@ -20,12 +24,87 @@ app.config['SQLALCHEMY_ECHO'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 
+#Setting up jwt
+app.config["JWT_SECRET_KEY"] = os.environ['SECRET_KEY']
+jwt = JWTManager(app)
+
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = False
+app.config["JWT_IDENTITY_CLAIM"] = "username"
+
+
 
 
 
 
 connect_db(app)
 db.create_all()
+
+#######################  AUTH ENDPOINTS START  ################################
+
+# Create a route to authenticate your users and return JWTs. The
+# create_access_token() function is used to actually generate the JWT.
+@app.route("/api/auth/login", methods=["POST"])
+def login():
+
+    data = request.json
+    username = data['username']
+    password = data['password']
+
+    user = User.authenticate(username, password)
+
+    # username = request.json.get("username", None)
+    # password = request.json.get("password", None)
+    # if username != "test" or password != "test":
+    #     return jsonify({"msg": "Bad username or password"}), 401
+
+    print("user", user)
+    print("username", user.username)
+    access_token = create_access_token(identity=user.username)
+    return jsonify(access_token=access_token)
+
+@app.post("/api/auth/signup")
+def create_user():
+    """Add user, and return data about new user.
+
+    Returns JSON like:
+        {user: {id, email, username, image_url, location, reserved_pools, owned_pools}}
+    """
+
+    data = request.json
+
+    # img = data['image_url']
+    # if data['image_url']:
+    #     filename = secure_filename(img.filename)
+    #     print("filename", filename)
+    #     img.save(filename)
+    #     res = s3.upload_file(
+    #         Bucket = BUCKET_NAME,
+    #         Filename=filename,
+    #         Key = filename
+    #     )
+
+    user = User.signup(
+        username=data['username'],
+        password=data['password'],
+        email=data['email'],
+        location=data['location'],
+    )
+    # user = User(
+    #     email=data['email'],
+    #     username=data['username'],
+    #     password=data['password'],
+    #     location=data['location'],
+    #     )
+
+
+
+    # db.session.add(user)
+    db.session.commit()
+
+    return (jsonify(user=user.serialize()), 201)
+
+#######################  AUTH ENDPOINTS END  ################################
+
 
 #######################  USERS ENDPOINTS START  ################################
 
@@ -58,44 +137,9 @@ def show_user(user_id):
 
 
 # create user
-@app.post("/api/users")
-def create_user():
-    """Add user, and return data about new user.
-
-    Returns JSON like:
-        {user: {id, email, username, image_url, location, reserved_pools, owned_pools}}
-    """
-
-    data = request.json
-    print("data", data)
-
-    img = data['image_url']
-    if data['image_url']:
-        filename = secure_filename(img.filename)
-        print("filename", filename)
-        img.save(filename)
-        res = s3.upload_file(
-            Bucket = BUCKET_NAME,
-            Filename=filename,
-            Key = filename
-        )
-
-
-
-    # user = User(
-    #     email=data['email'],
-    #     username=data['username'],
-    #     password=data['password'],
-    #     location=data['location'],
-    #     image_url=data['image_url'] or None)
-
-
-
-    # db.session.add(user)
-    # db.session.commit()
 
     # POST requests should return HTTP status of 201 CREATED
-    return (res)
+    # return (res)
 
 
     # TODO: update user

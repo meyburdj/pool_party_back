@@ -5,6 +5,8 @@ from datetime import datetime
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 
+
+
 bcrypt = Bcrypt()
 db = SQLAlchemy()
 
@@ -24,6 +26,10 @@ class User(db.Model):
         nullable=False,
         unique=True,
         primary_key=True
+    )
+
+    image_url = db.Column(
+        db.Text,
     )
 
     email = db.Column(
@@ -63,12 +69,8 @@ class User(db.Model):
             # "owned_pools" : self.owned_pools
         }
 
-
-    def __repr__(self):
-        return f"<User #{self.id}: {self.username}, {self.email}>"
-
     @classmethod
-    def signup(cls, username, email, password, image_url=DEFAULT_USER_IMAGE_URL):
+    def signup(cls, username, email, password, location, image_url=DEFAULT_USER_IMAGE_URL):
         """Sign up user.
 
         Hashes password and adds user to system.
@@ -81,6 +83,7 @@ class User(db.Model):
             email=email,
             password=hashed_pwd,
             image_url=image_url,
+            location=location
         )
 
         db.session.add(user)
@@ -106,6 +109,9 @@ class User(db.Model):
                 return user
 
         return False
+    
+    def __repr__(self):
+        return f"<User #{self.username}, {self.email}>"
 
 
 # Messages
