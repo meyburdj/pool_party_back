@@ -9,7 +9,7 @@ bcrypt = Bcrypt()
 db = SQLAlchemy()
 
 # TODO: USER DEFAULT IMAGE URL
-DEFAULT_USER_IMAGE_URL = ""
+DEFAULT_USER_IMAGE_URL = "testimage.jpg"
 # TODO: POOL DEFAULT IMAGE URL
 DEFAULT_POOL_IMAGE_URL = ""
 
@@ -51,17 +51,17 @@ class User(db.Model):
         nullable=False,
     )
 
-    reserved_pools = db.relationship(
-        'Pools',
-        secondary='owner',
-        backref='booker'
-    )
+    # reserved_pools = db.relationship(
+    #     'Pools',
+    #     secondary='owner',
+    #     backref='booker'
+    # )
 
-    owned_pools = db.relationship(
-        'Pools',
-        secondary='booker',
-        backref='owner'
-    )
+    # owned_pools = db.relationship(
+    #     'Pools',
+    #     secondary='booker',
+    #     backref='owner'
+    # )
 
     def serialize(self):
         """ returns self """
@@ -71,9 +71,8 @@ class User(db.Model):
             "username" : self.username,
             "image_url" : self.image_url,
             "location" : self.location,
-            "password" : self.password,
-            "reserved_pools" : self.reserved_pools,
-            "owned_pools" : self.owned_pools
+            # "reserved_pools" : self.reserved_pools,
+            # "owned_pools" : self.owned_pools
         }
 
 
@@ -189,7 +188,7 @@ class Pool(db.Model):
     )
 
     rate = db.Column(
-        db.Number,
+        db.Numeric(10,2),
         nullable=False
     )
 
@@ -262,7 +261,11 @@ class Reservation(db.Model):
         db.ForeignKey("pools.id", ondelete="CASCADE"),
         primary_key=True
     )
-    date = db.Column(
+    start_date = db.Column(
+        db.DateTime,
+        nullable=False,
+    )
+    end_date = db.Column(
         db.DateTime,
         nullable=False,
     )
