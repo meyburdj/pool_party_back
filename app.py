@@ -5,7 +5,6 @@ from models import db, connect_db, User, Message, Pool, Availability, Reservatio
 from sqlalchemy.exc import IntegrityError
 import boto3
 from werkzeug.utils import secure_filename
-from slugify import slugify
 
 load_dotenv()
 
@@ -46,6 +45,22 @@ def list_users():
 
     return jsonify(users=serialized)
 
+
+# // TODO: read specific user
+@app.get('/users/<int:user_id>')
+def show_user(user_id):
+    """Show user profile.
+
+    Returns JSON like:
+        {user: id, email, username, image_url, location, reserved_pools, owned_pools}
+    """
+    user = User.query.get_or_404(user_id)
+    user = user.serialize()
+
+    return jsonify(user=user)
+
+
+# create user
 @app.post("/api/users")
 def create_user():
     """Add user, and return data about new user.
@@ -67,7 +82,7 @@ def create_user():
             Filename=filename,
             Key = filename
         )
-        
+
 
 
     # user = User(
@@ -84,6 +99,30 @@ def create_user():
 
     # POST requests should return HTTP status of 201 CREATED
     return (res)
+
+
+    # TODO: update user
+
+
+
+    # TODO: delete user
+    @app.post('/users/delete')
+def delete_user():
+    """Delete user.
+
+    Redirect to signup page.
+    """
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    do_logout()
+
+    db.session.delete(g.user)
+    db.session.commit()
+
+    return redirect("/signup")
 
 
 ########################  USERS ENDPOINTS END  #################################
@@ -106,6 +145,11 @@ def list_pools():
 
     return jsonify(pools=serialized)
 
+
+# TODO: read specific pool
+
+
+# create pool
 @app.post("/api/pools")
 def create_pool():
     """Add pool, and return data about new pool.
@@ -132,7 +176,13 @@ def create_pool():
     return (jsonify(pool=pool.serialize()), 201)
 
 
-########################  USERS ENDPOINTS END  #################################
+# TODO: update pool
+
+
+# TODO: delete pool
+
+
+########################  POOLS ENDPOINTS END  #################################
 
 @app.post("/api/pools/images")
 def add_pool_image():
@@ -143,10 +193,15 @@ def add_pool_image():
     """
 
     file = request.files['file']
-    print("file.filename", file.filename)
+    print("file.filename: ", file.filename)
+    print("file: ", file)
+
+    # content = file.read()
+
     if file:
         filename = secure_filename(file.filename)
         file.save(filename)
+
         s3.upload_file(
             Bucket = BUCKET_NAME,
             Filename=filename,
@@ -154,6 +209,9 @@ def add_pool_image():
             Key = filename
         )
         url = f"{bucket_base_url}{filename}"
+
+        # TODO: refactor this later so it doesnt have to save to os.
+        os.remove(filename)
 
         return url
 
@@ -172,3 +230,19 @@ def add_pool_image():
 
     # # POST requests should return HTTP status of 201 CREATED
     # return (jsonify(user=user.serialize()), 201)
+
+
+    ########################  POOLS ENDPOINTS END  #################################
+
+
+    #######################  RESERVATIONS ENDPOINTS START  ################################
+
+    # TODO: CREATE RESERVATION
+
+    # TODO: READ RESERVATION
+
+    # TODO: GET ALL RESERVATIONS
+
+    # TODO: update reservation
+
+    # TODO: delete reservation
