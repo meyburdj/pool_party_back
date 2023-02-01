@@ -181,7 +181,7 @@ class Pool(db.Model):
         primary_key=True,
     )
 
-    user_id = db.Column(
+    owner_id = db.Column(
         db.Integer,
         db.ForeignKey("users.id"),
         nullable=False,
@@ -216,7 +216,7 @@ class Pool(db.Model):
         """ returns self """
         return {
             "id" : self.id,
-            "user_id" : self.user_id,
+            "owner_id" : self.owner_id,
             "rate" : self.rate,
             "size" : self.size,
             "description" : self.description,

@@ -5,7 +5,6 @@ from models import db, connect_db, User, Message, Pool, Availability, Reservatio
 from sqlalchemy.exc import IntegrityError
 import boto3
 
-
 load_dotenv()
 
 app = Flask(__name__)
@@ -50,10 +49,10 @@ def list_users():
 
 @app.post("/api/users")
 def create_user():
-    """Add cupcake, and return data about new cupcake.
+    """Add user, and return data about new user.
 
     Returns JSON like:
-        {cupcake: [{id, flavor, rating, size, image}]}
+        {user: {id, email, username, image_url, location, reserved_pools, owned_pools}}
     """
 
     data = request.json
@@ -70,6 +69,52 @@ def create_user():
 
     # POST requests should return HTTP status of 201 CREATED
     return (jsonify(user=user.serialize()), 201)
+
+
+########################  USERS ENDPOINTS END  #################################
+
+
+
+
+#######################  POOLS ENDPOINTS START  ################################
+
+@app.get("/api/pools")
+def list_pools():
+    """Return all pools in system.
+
+    Returns JSON like:
+        {pools: {id, owner_id, rate, size, description, address, image_url}, ...}
+    """
+    pools = Pool.query.all()
+
+    serialized = [pool.serialize() for pool in pools]
+
+    return jsonify(pools=serialized)
+
+@app.post("/api/pools")
+def create_pool():
+    """Add pool, and return data about new pool.
+
+    Returns JSON like:
+        {pool: {id, owner_id, rate, size, description, address, image_url}}
+    """
+
+    data = request.json
+    print("data", data)
+    pool = Pool(
+        owner_id=data['owner_id'],
+        rate=data['rate'],
+        size=data['size'],
+        description=data['description'],
+        address=data['address'],
+        image_url=data['image_url'],
+        )
+
+    db.session.add(pool)
+    db.session.commit()
+
+    # POST requests should return HTTP status of 201 CREATED
+    return (jsonify(pool=pool.serialize()), 201)
 
 
 ########################  USERS ENDPOINTS END  #################################
