@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from models import db, connect_db, User, Message, Pool, Availability, Reservation
 from sqlalchemy.exc import IntegrityError
+import boto3
 
 
 load_dotenv()
@@ -17,6 +18,17 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
+app.config['aws_access_key_id'] = os.environ['aws_access_key_id']
+app.config['aws_secret_access_key'] = os.environ['aws_secret_access_key']
+app.config['aws_session_token'] = os.environ['aws_session_token']
+
+
+s3 = boto3.client('s3',
+                    aws_access_key_id,
+                    aws_secret_access_key,
+                    aws_session_token
+                     )
+BUCKET_NAME='sharebnb-gmm'
 
 connect_db(app)
 db.create_all()
