@@ -37,27 +37,17 @@ db.create_all()
 
 #######################  AUTH ENDPOINTS START  ################################
 
-# Create a route to authenticate your users and return JWTs. The
-# create_access_token() function is used to actually generate the JWT.
-
-
 @app.route("/api/auth/login", methods=["POST"])
 def login():
+    """ Login user, returns JWT if authenticated """
 
     data = request.json
     username = data['username']
     password = data['password']
 
     user = User.authenticate(username, password)
-
-    # username = request.json.get("username", None)
-    # password = request.json.get("password", None)
-    # if username != "test" or password != "test":
-    #     return jsonify({"msg": "Bad username or password"}), 401
-
-    print("user", user)
-    print("username", user.username)
     access_token = create_access_token(identity=user.username)
+
     return jsonify(access_token=access_token)
 
 
@@ -88,14 +78,12 @@ def create_user():
         return (jsonify(user=user.serialize()), 201)
 
     except Exception as error:
-        print("error", error)
-        return error
-        # return (jsonify({"error": "Failed to signup"}), 424)
+        # print("error", error)
+        # return error
+        return (jsonify({"error": "Failed to signup"}), 424)
 
 
-#######################  AUTH ENDPOINTS END  ################################
-
-
+################################################################################ 
 #######################  USERS ENDPOINTS START  ################################
 
 @app.get("/api/users")
@@ -103,7 +91,8 @@ def list_users():
     """Return all users in system.
 
     Returns JSON like:
-        {users: [{id, email, username, image_url, location, reserved_pools, owned_pools}, ...]}
+        {users: [{id, email, username, image_url, 
+        location, reserved_pools, owned_pools}, ...]}
     """
     users = User.query.all()
 
@@ -111,8 +100,6 @@ def list_users():
 
     return jsonify(users=serialized)
 
-
-# // TODO: read specific user
 @app.get('/api/users/<username>')
 def show_user(username):
     """Show user profile.
@@ -126,7 +113,6 @@ def show_user(username):
     return jsonify(user=user)
 
 
-# // TODO: update user
 @app.patch('/api/users/<username>')
 @jwt_required()
 def update_user(username):
@@ -140,8 +126,6 @@ def update_user(username):
     if current_user == username:
         user = User.query.get_or_404(username)
         data = request.json
-
-        # user.username = data['username'],
         # TODO: ADD "CHANGE PASSWORD FEATURE LATER"
         user.email = data['email'],
         user.location = data['location'],
@@ -154,7 +138,6 @@ def update_user(username):
     return (jsonify({"error": "not authorized"}), 401)
 
 
-# // TODO: delete user
 @app.delete('/api/users/delete/<username>')
 @jwt_required()
 def delete_user(username):
@@ -171,10 +154,8 @@ def delete_user(username):
     return (jsonify({"error": "not authorized"}), 401)
 
 
-########################  USERS ENDPOINTS END  #################################
-
-
-#######################  POOLS ENDPOINTS START  ################################
+################################################################################
+######################## POOLS ENDPOINTS START #################################
 
 @app.get("/api/pools")
 def list_pools():
@@ -189,10 +170,18 @@ def list_pools():
     return jsonify(pools=serialized)
 
 
-# TODO: read specific pool
+@app.get('/api/pools/<int:pool_id>')
+def show_pool(pool_id):
+    """Show information on a specific pool.
 
+    Returns JSON like:
+        {pool: owner_username, rate, size, description, address}
+    """
+    pool = Pool.query.get_or_404(pool_id)
+    pool = pool.serialize()
 
-# create pool
+    return jsonify(pool=pool)
+
 @app.post("/api/pools")
 @jwt_required()
 def create_pool():
@@ -223,7 +212,6 @@ def create_pool():
     return (jsonify({"error": "not authorized"}), 401)
 
 
-# TODO: update pool
 @app.patch('/api/pools/<int:pool_id>')
 @jwt_required()
 def update_pool(pool_id):
@@ -253,9 +241,6 @@ def update_pool(pool_id):
 
     return (jsonify({"error": "not authorized"}), 401)
 
-
-# TODO: delete pool
-
 @app.delete('/api/pools/<int:pool_id>')
 @jwt_required()
 def delete_pool(pool_id):
@@ -278,16 +263,13 @@ def delete_pool(pool_id):
 
     return (jsonify({"error": "not authorized"}), 401)
 
-
-########################  POOLS ENDPOINTS END  #################################
-
 @app.post("/api/pools/<int:pool_id>/images")
 @jwt_required()
 def add_pool_image(pool_id):
-    """Add user, and return data about new user.
+    """Add pool image, and return data about pool image.
 
     Returns JSON like:
-        {user: {id, email, username, image_url, location, reserved_pools, owned_pools}}
+        {pool_image: {id, pool_owner, image_url }}
     """
     # TODO: if we get an array of files, then we could do a list comprehension where
     # we use the helper function and add that to the table for each one in the comprehension
@@ -310,46 +292,7 @@ def add_pool_image(pool_id):
 
     return (jsonify({"error": "not authorized"}), 401)
 
-    # user = User(
-    #     email=data['email'],
-    #     username=data['username'],
-    #     password=data['password'],
-    #     location=data['location'],
-    #     image_url=data['image_url'] or None)
-
-    # db.session.add(user)
-    # db.session.commit()
-
-    # # POST requests should return HTTP status of 201 CREATED
-    # return (jsonify(user=user.serialize()), 201)
-
-    ########################  POOLS ENDPOINTS END  #################################
-
-    #######################  RESERVATIONS ENDPOINTS START  ################################
-
-    # TODO: CREATE RESERVATION
-    # post request to make reservation
-    # reservation_id generated
-    # get pool_id from front_end
-    # then able to get owner information through username
-
-    # info in body to be sent
-    # poolid
-	# startdate
-	# endDate
-	# userbooking
-
-
-    # TODO: READ RESERVATION
-
-    # TODO: GET ALL RESERVATIONS
-
-
-    # TODO: update reservation
-
-    # TODO: delete reservation
-
-
+################################################################################
 #######################  MESSAGES ENDPOINTS START  #############################
 
 
@@ -397,7 +340,6 @@ def create_message():
     return (jsonify(message=message.serialize()), 201)
 
 
-# TODO: GET SPECIFIC MESSAGES
 @app.get("/api/messages/<message_id>")
 @jwt_required
 def show_message(message_id):
@@ -413,6 +355,66 @@ def show_message(message_id):
         return jsonify(message=message)
     else:
         return (jsonify({"error": "not authorized"}), 401)
+
+   
+
+################################################################################
+#####################  RESERVATIONS ENDPOINTS START  ###########################
+
+@app.get("/api/reservations/<int:pool_id>")
+@jwt_required()
+def get_reservations_for_pool(pool_id):
+    """ Gets all reservations assocaited with pool_id """
+
+    current_user = get_jwt_identity()
+
+    pool = Pool.query.get_or_404(pool_id)
+    if(pool.owner_username==current_user):
+        reservations = (Reservation.query
+        .filter(pool_id=pool_id)
+        .order_by(Reservation.start_date.desc()))
+
+        serialized_reservations = ([reservation.serialize() 
+            for reservation in reservations])
+
+        return (jsonify(reservations=serialized_reservations))
+
+    #TODO: better error handling for more diverse errors    
+    return (jsonify({"error": "not authorized"}), 401)
+
+
+@app.get("/api/reservations/<username>")
+@jwt_required()
+def get_booked_reservations_for_username(username):
+    """ Gets all reservations created by a username """
+
+    current_user = get_jwt_identity()
+
+    user = User.query.get_or_404(username)
+    if(user.username==current_user):
+        reservations = (Reservation.query
+        .filter(username=username)
+        .order_by(Reservation.start_date.desc()))
+
+        serialized_reservations = ([reservation.serialize() 
+            for reservation in reservations])
+
+        return (jsonify(reservations=serialized_reservations))
+
+    #TODO: better error handling for more diverse errors    
+    return (jsonify({"error": "not authorized"}), 401)
+
+
+    # TODO: READ RESERVATION
+
+    # TODO: GET ALL RESERVATIONS
+
+
+    # TODO: update reservation
+
+    # TODO: delete reservation
+
+
 
 
 ########################  MESSAGES ENDPOINTS END  ##############################
