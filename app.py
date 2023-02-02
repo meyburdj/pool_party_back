@@ -345,3 +345,58 @@ def add_pool_image(pool_id):
     # TODO: update reservation
 
     # TODO: delete reservation
+
+    
+#######################  MESSAGES ENDPOINTS START  #############################
+
+
+@app.get("/api/messages")
+@jwt_required()
+def list_messages():
+
+
+    current_user = get_jwt_identity()
+    #inbox
+    messages_inbox = Message.query.filter(Message.sender_username == current_user)
+    serialized_inbox = [message.serialize() for message in messages_inbox]
+    
+    #outbox
+    messages_outbox = Message.query.filter(Message.recipient_username == current_user)
+    serialized_inbox = [message.serialize() for message in message_outbox]
+
+    response = {"inbox": serialized_inbox, "outbox": serialized_outbox}
+    return response
+
+@app.post("/api/messages")
+@jwt_required()
+def create_message():
+
+
+    current_user = get_jwt_identity()
+
+    
+    #inbox
+    messages_inbox = Message.query.filter(Message.sender_username == current_user)
+    serialized_inbox = [message.serialize() for message in messages_inbox]
+    
+    #outbox
+    messages_outbox = Message.query.filter(Message.recipient_username == current_user)
+    serialized_inbox = [message.serialize() for message in message_outbox]
+
+    response = {"inbox": serialized_inbox, "outbox": serialized_outbox}
+    return response
+
+
+
+
+
+
+
+
+
+
+
+
+
+########################  MESSAGES ENDPOINTS END  ##############################
+

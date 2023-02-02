@@ -141,9 +141,20 @@ class Message(db.Model):
     )
 
     # text
-    text = db.Column(
+    title = db.Column(
         db.Text,
         nullable=False,
+    )
+    # text
+    body = db.Column(
+        db.Text,
+        nullable=False,
+    )
+
+    #listing message is associated with
+    listing = db.Column(
+        db.Integer,
+        nullable=false,
     )
 
     # timestamp
@@ -159,8 +170,11 @@ class Message(db.Model):
             "id" : self.id,
             "sender_username" : self.sender_username,
             "recipient_username" : self.recipient_username,
-            "text" : self.text,
+            "body" : self.body,
+            "title" : self.title,
+            "listing" : self.listing,
             "timestamp" : self.timestamp
+
         }
 
 
