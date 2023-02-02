@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
-from models import db, connect_db, User, Message, Pool, Availability, Reservation, PoolImage
+from models import db, connect_db, User, Message, Pool, Reservation, PoolImage
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
@@ -78,12 +78,11 @@ def create_user():
         return (jsonify(user=user.serialize()), 201)
 
     except Exception as error:
-        # print("error", error)
-        # return error
+        print("Error", error)
         return (jsonify({"error": "Failed to signup"}), 424)
 
 
-################################################################################ 
+################################################################################
 #######################  USERS ENDPOINTS START  ################################
 
 @app.get("/api/users")
@@ -91,7 +90,7 @@ def list_users():
     """Return all users in system.
 
     Returns JSON like:
-        {users: [{id, email, username, image_url, 
+        {users: [{id, email, username, image_url,
         location, reserved_pools, owned_pools}, ...]}
     """
     users = User.query.all()
@@ -356,10 +355,36 @@ def show_message(message_id):
     else:
         return (jsonify({"error": "not authorized"}), 401)
 
-   
+
 
 ################################################################################
 #####################  RESERVATIONS ENDPOINTS START  ###########################
+
+@app.post("/api/reservations/<int:pool_id>")
+@jwt_required
+def create_reservation(pool_id):
+    """ Creates a reservation for the pool you looking at if you are logged in """
+
+    current_user = get_jwt_identity()
+
+    if current_user:
+
+        data=request.json
+
+        reservation = Reservation(
+            booked_username=current_user,
+            pool_id=pool_id,
+            start_date=data['start_date'],
+            end_date=data['end_date']
+        )
+
+        db.session.add(reservation)
+        db.session.commit()
+
+        return (jsonify(reservation=reservation.serialize()), 201)
+
+    return (jsonify({"error": "not authorized"}), 401)
+
 
 @app.get("/api/reservations/<int:pool_id>")
 @jwt_required()
@@ -374,12 +399,12 @@ def get_reservations_for_pool(pool_id):
         .filter(pool_id=pool_id)
         .order_by(Reservation.start_date.desc()))
 
-        serialized_reservations = ([reservation.serialize() 
+        serialized_reservations = ([reservation.serialize()
             for reservation in reservations])
 
         return (jsonify(reservations=serialized_reservations))
 
-    #TODO: better error handling for more diverse errors    
+    #TODO: better error handling for more diverse errors
     return (jsonify({"error": "not authorized"}), 401)
 
 
@@ -396,23 +421,61 @@ def get_booked_reservations_for_username(username):
         .filter(username=username)
         .order_by(Reservation.start_date.desc()))
 
-        serialized_reservations = ([reservation.serialize() 
+        serialized_reservations = ([reservation.serialize()
             for reservation in reservations])
 
         return (jsonify(reservations=serialized_reservations))
 
-    #TODO: better error handling for more diverse errors    
+    #TODO: better error handling for more diverse errors
     return (jsonify({"error": "not authorized"}), 401)
 
 
-    # TODO: READ RESERVATION
+@app.get("/api/reservations/<int:reservation_id>")
+@jwt_required()
+def get_booked_reservation(reservation_id):
+    """ Gets specific reservation """
 
-    # TODO: GET ALL RESERVATIONS
+    current_user = get_jwt_identity()
+
+    reservation = Reservation.get_or_404(reservation_id)
+    pool_id = reservation.pool_id
+    pool = Pool.get_or_404(pool_id)
+
+    if ((reservation.booked_username == current_user) or
+        (pool.owner_username == current_user)):
+
+        serialized_reservation = reservation.serialize()
+
+        return (jsonify(reservation=serialized_reservation), 200)
+
+    #TODO: better error handling for more diverse errors
+    return (jsonify({"error": "not authorized"}), 401)
 
 
-    # TODO: update reservation
+# TODO: delete reservation
+@app.delete("/api/reservations/<int:reservation_id>")
+@jwt_required()
+def delete_booked_reservation(reservation_id):
+    """ Deletes a specific reservation if either pool owner or reservation booker """
 
-    # TODO: delete reservation
+    current_user = get_jwt_identity()
+
+    reservation = Reservation.get_or_404(reservation_id)
+    pool_id = reservation.pool_id
+    pool = Pool.get_or_404(pool_id)
+
+    if ((reservation.booked_username == current_user) or
+        (pool.owner_username == current_user)):
+
+
+        db.session.delete(reservation)
+        db.session.commit()
+
+        return (jsonify("Reservation successfully deleted"), 200)
+
+    #TODO: better error handling for more diverse errors
+    return (jsonify({"error": "not authorized"}), 401)
+
 
 
 

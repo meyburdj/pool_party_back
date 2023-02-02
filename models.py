@@ -229,26 +229,6 @@ class Pool(db.Model):
         }
 
 
-class Availability(db.Model):
-    """ Connection of a pool to its available dates """
-
-    id = db.Column(
-        db.Integer,
-        nullable=False,
-        primary_key=True
-    )
-
-    date = db.Column(
-        db.DateTime,
-        nullable=False,
-    )
-
-    pool_id = db.Column(
-        db.Integer,
-        db.ForeignKey("pools.id", ondelete="CASCADE"),
-    )
-
-
 class Reservation(db.Model):
     """ Connection of a User and Pool that they reserve """
 
@@ -259,7 +239,7 @@ class Reservation(db.Model):
         primary_key=True
     )
 
-    username = db.Column( # booker's username
+    booked_username = db.Column(
         db.Text,
         db.ForeignKey("users.username", ondelete="CASCADE"),
     )
@@ -271,7 +251,8 @@ class Reservation(db.Model):
 
     reservation_date_created = db.Column(
         db.DateTime,
-        nullable=False
+        nullable=False,
+        default=datetime.utcnow,
     )
 
     start_date = db.Column(
