@@ -67,29 +67,27 @@ def create_user():
         {user: {id, email, username, image_url, location, reserved_pools, owned_pools}}
     """
 
-    data = request.json
+    form = request.form
 
-    # img = data['image_url']
-    # if data['image_url']:
-    #     filename = secure_filename(img.filename)
-    #     print("filename", filename)
-    #     img.save(filename)
-    #     res = s3.upload_file(
-    #         Bucket = BUCKET_NAME,
-    #         Filename=filename,
-    #         Key = filename
-    #     )
+    file = request.files['file']
 
-    user = User.signup(
-        username=data['username'],
-        password=data['password'],
-        email=data['email'],
-        location=data['location'],
-    )
+    if (file):
+        url = upload_to_aws(file)
 
-    db.session.commit()
+        user = User.signup(
+            username=form['username'],
+            password=form['password'],
+            email=form['email'],
+            location=form['location'],
+            image_url=url
+        )
 
-    return (jsonify(user=user.serialize()), 201)
+        db.session.commit()
+
+        return (jsonify(user=user.serialize()), 201)
+
+    return (jsonify({"error": "Failed to signup"}), 424)
+
 
 #######################  AUTH ENDPOINTS END  ################################
 
@@ -148,7 +146,7 @@ def update_user(username):
         db.session.commit()
 
         return (jsonify(user=user.serialize()), 200)
-    
+
     return (jsonify({"error": "not authorized"}), 401)
 
 
@@ -227,10 +225,10 @@ def create_pool():
 @app.patch('/api/pools/<int:pool_id>')
 @jwt_required()
 def update_pool(pool_id):
-    """ update pool information 
-    
-    Returns JSON like: 
-    {pool: owner_username, rate, size, description, address} 
+    """ update pool information
+
+    Returns JSON like:
+    {pool: owner_username, rate, size, description, address}
 
     Authorization: must be owner of pool
     """
@@ -260,10 +258,10 @@ def update_pool(pool_id):
 @app.delete('/api/pools/<int:pool_id>')
 @jwt_required()
 def delete_pool(pool_id):
-    """ update pool information 
-    
-    Returns JSON like: 
-    {pool: owner_username, rate, size, description, address} 
+    """ update pool information
+
+    Returns JSON like:
+    {pool: owner_username, rate, size, description, address}
 
     Authorization: must be owner of pool
     """
@@ -271,7 +269,7 @@ def delete_pool(pool_id):
     current_user = get_jwt_identity()
     pool = Pool.query.get_or_404(pool_id)
     if current_user == pool.owner_username:
-        
+
         db.session.delete(pool)
         db.session.commit()
 

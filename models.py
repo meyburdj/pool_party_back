@@ -5,8 +5,6 @@ from datetime import datetime
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 
-
-
 bcrypt = Bcrypt()
 db = SQLAlchemy()
 
@@ -14,6 +12,7 @@ db = SQLAlchemy()
 DEFAULT_USER_IMAGE_URL = "testimage.jpg"
 # TODO: POOL DEFAULT IMAGE URL
 DEFAULT_POOL_IMAGE_URL = ""
+
 
 # USERS
 class User(db.Model):
@@ -65,6 +64,8 @@ class User(db.Model):
             "username" : self.username,
             "email" : self.email,
             "location" : self.location,
+            "image_url" : self.image_url,
+
             # "reserved_pools" : self.reserved_pools,
             # "owned_pools" : self.owned_pools
         }
@@ -109,7 +110,7 @@ class User(db.Model):
                 return user
 
         return False
-    
+
     def __repr__(self):
         return f"<User #{self.username}, {self.email}>"
 
