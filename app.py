@@ -7,6 +7,7 @@ from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 
 from api_helpers import upload_to_aws
 
@@ -14,6 +15,7 @@ from api_helpers import upload_to_aws
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
 
 # Get DB_URI from environ variable (useful for production/testing) or,
 # if not set there, use development local db.
