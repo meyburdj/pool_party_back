@@ -60,14 +60,22 @@ def create_user():
     Returns JSON like:
         {user: {id, email, username, image_url, location, reserved_pools, owned_pools}}
     """
+    print("form", request.form)
     try:
         form = request.form
+        print("form", form)
 
         file = request.files.get('file')
         url = None
         if (file):
             url = upload_to_aws(file)
             print("url", url)
+            print("request.form.get('text')", request.form.get('text'))
+            print("request.form['text']", request.form['text'])
+            print("request.form['text'].keys()", request.form['text'].keys())
+            print("request.forms.keys", request.form.keys())
+            print("request.forms.items", request.form.items())
+
         user = User.signup(
             username=form['username'],
             password=form['password'],
