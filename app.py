@@ -361,7 +361,7 @@ def show_message(message_id):
 #####################  RESERVATIONS ENDPOINTS START  ###########################
 
 @app.post("/api/reservations/<int:pool_id>")
-@jwt_required
+@jwt_required()
 def create_reservation(pool_id):
     """ Creates a reservation for the pool you looking at if you are logged in """
 
