@@ -259,7 +259,7 @@ class Reservation(db.Model):
         primary_key=True
     )
 
-    username = db.Column(
+    username = db.Column( # booker's username
         db.Text,
         db.ForeignKey("users.username", ondelete="CASCADE"),
     )

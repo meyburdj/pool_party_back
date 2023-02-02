@@ -328,10 +328,22 @@ def add_pool_image(pool_id):
     #######################  RESERVATIONS ENDPOINTS START  ################################
 
     # TODO: CREATE RESERVATION
+    # post request to make reservation
+    # reservation_id generated
+    # get pool_id from front_end
+    # then able to get owner information through username
+
+    # info in body to be sent
+    # poolid
+	# startdate
+	# endDate
+	# userbooking
+
 
     # TODO: READ RESERVATION
 
     # TODO: GET ALL RESERVATIONS
+
 
     # TODO: update reservation
 
