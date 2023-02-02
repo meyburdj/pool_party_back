@@ -154,7 +154,7 @@ class Message(db.Model):
     #listing message is associated with
     listing = db.Column(
         db.Integer,
-        nullable=false,
+        nullable=False,
     )
 
     # timestamp

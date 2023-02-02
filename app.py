@@ -24,13 +24,12 @@ app.config['SQLALCHEMY_ECHO'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 
-#Setting up jwt
+# Setting up jwt
 app.config["JWT_SECRET_KEY"] = os.environ['SECRET_KEY']
 jwt = JWTManager(app)
 
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = False
 app.config["JWT_IDENTITY_CLAIM"] = "username"
-
 
 
 connect_db(app)
@@ -40,6 +39,8 @@ db.create_all()
 
 # Create a route to authenticate your users and return JWTs. The
 # create_access_token() function is used to actually generate the JWT.
+
+
 @app.route("/api/auth/login", methods=["POST"])
 def login():
 
@@ -58,6 +59,7 @@ def login():
     print("username", user.username)
     access_token = create_access_token(identity=user.username)
     return jsonify(access_token=access_token)
+
 
 @app.post("/api/auth/signup")
 def create_user():
@@ -80,11 +82,11 @@ def create_user():
             email=form['email'],
             location=form['location'],
             image_url=url
-            )
+        )
         db.session.commit()
 
         return (jsonify(user=user.serialize()), 201)
-    
+
     except Exception as error:
         print("error", error)
         return error
@@ -152,7 +154,6 @@ def update_user(username):
     return (jsonify({"error": "not authorized"}), 401)
 
 
-
 # // TODO: delete user
 @app.delete('/api/users/delete/<username>')
 @jwt_required()
@@ -171,8 +172,6 @@ def delete_user(username):
 
 
 ########################  USERS ENDPOINTS END  #################################
-
-
 
 
 #######################  POOLS ENDPOINTS START  ################################
@@ -213,7 +212,7 @@ def create_pool():
             size=data['size'],
             description=data['description'],
             address=data['address']
-            )
+        )
 
         db.session.add(pool)
         db.session.commit()
@@ -242,10 +241,10 @@ def update_pool(pool_id):
     if current_user == pool.owner_username:
         data = request.json
 
-        pool.rate=data['rate'],
-        pool.size=data['size'],
-        pool.description=data['description'],
-        pool.address=data['address']
+        pool.rate = data['rate'],
+        pool.size = data['size'],
+        pool.description = data['description'],
+        pool.address = data['address']
 
         db.session.add(pool)
         db.session.commit()
@@ -253,7 +252,6 @@ def update_pool(pool_id):
         return (jsonify(pool=pool.serialize()), 200)
 
     return (jsonify({"error": "not authorized"}), 401)
-
 
 
 # TODO: delete pool
@@ -291,8 +289,8 @@ def add_pool_image(pool_id):
     Returns JSON like:
         {user: {id, email, username, image_url, location, reserved_pools, owned_pools}}
     """
-    #TODO: if we get an array of files, then we could do a list comprehension where
-    #we use the helper function and add that to the table for each one in the comprehension
+    # TODO: if we get an array of files, then we could do a list comprehension where
+    # we use the helper function and add that to the table for each one in the comprehension
 
     current_user = get_jwt_identity()
     pool = Pool.query.get_or_404(pool_id)
@@ -308,12 +306,9 @@ def add_pool_image(pool_id):
         db.session.add(pool_image)
         db.session.commit()
 
-
         return (jsonify(pool_image=pool_image.serialize()), 201)
 
     return (jsonify({"error": "not authorized"}), 401)
-
-
 
     # user = User(
     #     email=data['email'],
@@ -322,17 +317,13 @@ def add_pool_image(pool_id):
     #     location=data['location'],
     #     image_url=data['image_url'] or None)
 
-
-
     # db.session.add(user)
     # db.session.commit()
 
     # # POST requests should return HTTP status of 201 CREATED
     # return (jsonify(user=user.serialize()), 201)
 
-
     ########################  POOLS ENDPOINTS END  #################################
-
 
     #######################  RESERVATIONS ENDPOINTS START  ################################
 
@@ -346,57 +337,70 @@ def add_pool_image(pool_id):
 
     # TODO: delete reservation
 
-    
+
 #######################  MESSAGES ENDPOINTS START  #############################
 
 
 @app.get("/api/messages")
 @jwt_required()
 def list_messages():
-
+    """ Gets all messages outgoing and incoming to view """
 
     current_user = get_jwt_identity()
-    #inbox
-    messages_inbox = Message.query.filter(Message.sender_username == current_user)
+    # inbox
+    messages_inbox = (Message.query
+                      .filter(Message.recipient_username == current_user)
+                      .order_by(Message.timestamp.desc()))
     serialized_inbox = [message.serialize() for message in messages_inbox]
-    
-    #outbox
-    messages_outbox = Message.query.filter(Message.recipient_username == current_user)
-    serialized_inbox = [message.serialize() for message in message_outbox]
+
+    # outbox
+    messages_outbox = (Message.query
+                       .filter(Message.sender_username == current_user)
+                       .order_by(Message.timestamp.desc()))
+    serialized_outbox = [message.serialize() for message in messages_outbox]
 
     response = {"inbox": serialized_inbox, "outbox": serialized_outbox}
     return response
+
 
 @app.post("/api/messages")
 @jwt_required()
 def create_message():
-
+    """ Creates a message to be sent to listing owner. """
 
     current_user = get_jwt_identity()
 
-    
-    #inbox
-    messages_inbox = Message.query.filter(Message.sender_username == current_user)
-    serialized_inbox = [message.serialize() for message in messages_inbox]
-    
-    #outbox
-    messages_outbox = Message.query.filter(Message.recipient_username == current_user)
-    serialized_inbox = [message.serialize() for message in message_outbox]
+    data = request.json
+    message = Message(
+        sender_username=current_user,
+        recipient_username=data['recipient_username'],
+        title=data['title'],
+        body=data['body'],
+        listing=data['listing'],
+    )
 
-    response = {"inbox": serialized_inbox, "outbox": serialized_outbox}
-    return response
+    db.session.add(message)
+    db.session.commit()
 
-
-
-
+    return (jsonify(message=message.serialize()), 201)
 
 
+# TODO: GET SPECIFIC MESSAGES
+@app.get("/api/messages/<message_id>")
+@jwt_required
+def show_message(message_id):
+    """ Show specific message """
 
+    current_user = get_jwt_identity()
 
+    message = User.query.get_404(message_id)
 
-
-
+    if ((message.sender_username == current_user) or
+        (message.recipient_username == current_user)):
+        message = message.serialize()
+        return jsonify(message=message)
+    else:
+        return (jsonify({"error": "not authorized"}), 401)
 
 
 ########################  MESSAGES ENDPOINTS END  ##############################
-
