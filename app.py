@@ -126,6 +126,7 @@ def show_user(username):
 
 # // TODO: update user
 @app.patch('/api/users/<username>')
+@jwt_required()
 def update_user(username):
     """ update user information
 
@@ -133,33 +134,40 @@ def update_user(username):
         {user: id, email, username, image_url, location, reserved_pools, owned_pools}
     """
 
-    user = User.query.get_or_404(username)
-    print("user", user)
-    data = request.json
+    current_user = get_jwt_identity()
+    if current_user == username:
+        user = User.query.get_or_404(username)
+        data = request.json
 
-    user.username = data['username'],
-    # TODO: ADD "CHANGE PASSWORD FEATURE LATER"
-    user.email = data['email'],
-    user.location = data['location'],
+        # user.username = data['username'],
+        # TODO: ADD "CHANGE PASSWORD FEATURE LATER"
+        user.email = data['email'],
+        user.location = data['location'],
 
-    db.session.add(user)
-    db.session.commit()
+        db.session.add(user)
+        db.session.commit()
 
-    return (jsonify(user=user.serialize()), 200)
+        return (jsonify(user=user.serialize()), 200)
+    
+    return (jsonify({"error": "not authorized"}), 401)
 
 
 
 # // TODO: delete user
 @app.delete('/api/users/delete/<username>')
+@jwt_required()
 def delete_user(username):
     """Delete user. """
 
-    user = User.query.get_or_404(username)
+    current_user = get_jwt_identity()
+    if current_user == username:
+        user = User.query.get_or_404(username)
 
-    db.session.delete(user)
-    db.session.commit()
+        db.session.delete(user)
+        db.session.commit()
 
-    return jsonify("User successfully deleted", 200)
+        return jsonify("User successfully deleted", 200)
+    return (jsonify({"error": "not authorized"}), 401)
 
 
 ########################  USERS ENDPOINTS END  #################################
@@ -179,7 +187,6 @@ def list_pools():
     pools = Pool.query.all()
 
     serialized = [pool.serialize() for pool in pools]
-
     return jsonify(pools=serialized)
 
 
@@ -188,35 +195,89 @@ def list_pools():
 
 # create pool
 @app.post("/api/pools")
+@jwt_required()
 def create_pool():
     """Add pool, and return data about new pool.
 
     Returns JSON like:
         {pool: {id, owner_id, rate, size, description, address, image_url}}
     """
+    current_user = get_jwt_identity()
+    if current_user:
+        data = request.json
+        print("data", data)
+        pool = Pool(
+            owner_username=current_user,
+            rate=data['rate'],
+            size=data['size'],
+            description=data['description'],
+            address=data['address']
+            )
 
-    data = request.json
-    print("data", data)
-    pool = Pool(
-        owner_id=data['owner_id'],
-        rate=data['rate'],
-        size=data['size'],
-        description=data['description'],
-        address=data['address'],
-        image_url=data['image_url'],
-        )
+        db.session.add(pool)
+        db.session.commit()
 
-    db.session.add(pool)
-    db.session.commit()
+        # POST requests should return HTTP status of 201 CREATED
+        return (jsonify(pool=pool.serialize()), 201)
 
-    # POST requests should return HTTP status of 201 CREATED
-    return (jsonify(pool=pool.serialize()), 201)
+    return (jsonify({"error": "not authorized"}), 401)
 
 
 # TODO: update pool
+@app.patch('/api/pools/<int:pool_id>')
+@jwt_required()
+def update_pool(pool_id):
+    """ update pool information 
+    
+    Returns JSON like: 
+    {pool: owner_username, rate, size, description, address} 
+
+    Authorization: must be owner of pool
+    """
+
+    current_user = get_jwt_identity()
+    pool = Pool.query.get_or_404(pool_id)
+    print("pool owner", pool.owner_username)
+    if current_user == pool.owner_username:
+        data = request.json
+
+        pool.rate=data['rate'],
+        pool.size=data['size'],
+        pool.description=data['description'],
+        pool.address=data['address']
+
+        db.session.add(pool)
+        db.session.commit()
+
+        return (jsonify(pool=pool.serialize()), 200)
+
+    return (jsonify({"error": "not authorized"}), 401)
+
 
 
 # TODO: delete pool
+
+@app.delete('/api/pools/<int:pool_id>')
+@jwt_required()
+def delete_pool(pool_id):
+    """ update pool information 
+    
+    Returns JSON like: 
+    {pool: owner_username, rate, size, description, address} 
+
+    Authorization: must be owner of pool
+    """
+
+    current_user = get_jwt_identity()
+    pool = Pool.query.get_or_404(pool_id)
+    if current_user == pool.owner_username:
+        
+        db.session.delete(pool)
+        db.session.commit()
+
+        return (jsonify("Pool successfully deleted"), 200)
+
+    return (jsonify({"error": "not authorized"}), 401)
 
 
 ########################  POOLS ENDPOINTS END  #################################

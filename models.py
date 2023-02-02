@@ -206,7 +206,7 @@ class Pool(db.Model):
         """ returns self """
         return {
             "id" : self.id,
-            "owner_id" : self.owner_id,
+            "owner_username" : self.owner_username,
             "rate" : self.rate,
             "size" : self.size,
             "description" : self.description,
