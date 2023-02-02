@@ -75,7 +75,12 @@ def create_user():
         )
         db.session.commit()
 
-        return (jsonify(user=user.serialize()), 201)
+        # user = User.authenticate(username, password)
+        access_token = create_access_token(identity=user.username)
+        return jsonify(access_token=access_token)
+
+
+        # return (jsonify(user=user.serialize()), 201)
 
     except Exception as error:
         print("Error", error)

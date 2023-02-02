@@ -234,7 +234,7 @@ class Reservation(db.Model):
 
     __tablename__ = "reservations"
 
-    reservation_id = db.Column(
+    id = db.Column(
         db.Integer,
         primary_key=True
     )
@@ -268,7 +268,7 @@ class Reservation(db.Model):
         """ returns self """
         return {
             "id" : self.id,
-            "username" : self.username,
+            "username" : self.booked_username,
             "pool_id" : self.pool_id,
             "reservation_date_created" : self.reservation_date_created,
             "start_date" : self.start_date,
