@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
-from models import db, connect_db, User, Message, Pool, Availability, Reservation
+from models import db, connect_db, User, Message, Pool, Availability, Reservation, PoolImage
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
@@ -66,27 +66,29 @@ def create_user():
     Returns JSON like:
         {user: {id, email, username, image_url, location, reserved_pools, owned_pools}}
     """
+    try:
+        form = request.form
 
-    form = request.form
-
-    file = request.files['file']
-
-    if (file):
-        url = upload_to_aws(file)
-
+        file = request.files.get('file')
+        url = None
+        if (file):
+            url = upload_to_aws(file)
+            print("url", url)
         user = User.signup(
             username=form['username'],
             password=form['password'],
             email=form['email'],
             location=form['location'],
             image_url=url
-        )
-
+            )
         db.session.commit()
 
         return (jsonify(user=user.serialize()), 201)
-
-    return (jsonify({"error": "Failed to signup"}), 424)
+    
+    except Exception as error:
+        print("error", error)
+        return error
+        # return (jsonify({"error": "Failed to signup"}), 424)
 
 
 #######################  AUTH ENDPOINTS END  ################################
@@ -200,6 +202,7 @@ def create_pool():
     Returns JSON like:
         {pool: {id, owner_id, rate, size, description, address, image_url}}
     """
+
     current_user = get_jwt_identity()
     if current_user:
         data = request.json
@@ -280,20 +283,36 @@ def delete_pool(pool_id):
 
 ########################  POOLS ENDPOINTS END  #################################
 
-@app.post("/api/pools/images")
-def add_pool_image():
+@app.post("/api/pools/<int:pool_id>/images")
+@jwt_required()
+def add_pool_image(pool_id):
     """Add user, and return data about new user.
 
     Returns JSON like:
         {user: {id, email, username, image_url, location, reserved_pools, owned_pools}}
     """
+    #TODO: if we get an array of files, then we could do a list comprehension where
+    #we use the helper function and add that to the table for each one in the comprehension
 
-    file = request.files['file']
-
-    if file:
+    current_user = get_jwt_identity()
+    pool = Pool.query.get_or_404(pool_id)
+    if current_user == pool.owner_username:
+        file = request.files['file']
         url = upload_to_aws(file)
 
-        return url
+        pool_image = PoolImage(
+            pool_owner=current_user,
+            image_url=url
+        )
+
+        db.session.add(pool_image)
+        db.session.commit()
+
+
+        return (jsonify(pool_image=pool_image.serialize()), 201)
+
+    return (jsonify({"error": "not authorized"}), 401)
+
 
 
     # user = User(

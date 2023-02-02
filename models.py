@@ -313,11 +313,18 @@ class PoolImage(db.Model):
         db.ForeignKey("users.username", ondelete="CASCADE"),
     )
 
-    image_path = db.Column(
+    image_url = db.Column(
         db.Text,
         nullable = False
     )
 
+    def serialize(self):
+        """ returns self """
+        return {
+            "id" : self.id,
+            "pool_owner" : self.pool_owner,
+            "image_url" : self.image_url,
+        }
 
 
 # db
