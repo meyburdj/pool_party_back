@@ -69,12 +69,12 @@ def create_user():
         url = None
         if (file):
             url = upload_to_aws(file)
-            print("url", url)
-            print("request.form.get('text')", request.form.get('text'))
-            print("request.form['text']", request.form['text'])
-            print("request.form['text'].keys()", request.form['text'].keys())
-            print("request.forms.keys", request.form.keys())
-            print("request.forms.items", request.form.items())
+            # print("url", url)
+            # print("request.form.get('text')", request.form.get('text'))
+            # print("request.form['text']", request.form['text'])
+            # print("request.form['text'].keys()", request.form['text'].keys())
+            # print("request.forms.keys", request.form.keys())
+            # print("request.forms.items", request.form.items())
 
         user = User.signup(
             username=form['username'],
@@ -85,9 +85,12 @@ def create_user():
         )
         db.session.commit()
 
+
         # user = User.authenticate(username, password)
-        access_token = create_access_token(identity=user.username)
-        return jsonify(access_token=access_token)
+        token = create_access_token(identity=user.username)
+        print("jsonify token: ", jsonify(token=token))
+
+        return jsonify(token=token)
 
 
         # return (jsonify(user=user.serialize()), 201)
