@@ -188,7 +188,7 @@ def list_pools():
 
 
 @app.get('/api/pools/<int:pool_id>')
-def show_pool(pool_id):
+def show_pool_by_id(pool_id):
     """Show information on a specific pool.
 
     Returns JSON like:
@@ -198,6 +198,18 @@ def show_pool(pool_id):
     pool = pool.serialize()
 
     return jsonify(pool=pool)
+
+@app.get('/api/pools/<city>')
+def show_pool_by_city(city):
+    """Show information on a specific pool.
+
+    Returns JSON like:
+        {pool: owner_username, rate, size, description, address}
+    """
+    pools = Pool.query.filter(Pool.city == city)
+    serialized = [pool.serialize() for pool in pools]
+
+    return jsonify(pools=serialized)
 
 # @app.post("/api/pools")
 # @jwt_required()
