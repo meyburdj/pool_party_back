@@ -39,7 +39,7 @@ db.session.commit()
 
 # region pools#########################
 pool1 = Pool(
- 
+
     owner_username="test1",
     rate=10.00,
     size="20x20",
@@ -49,7 +49,7 @@ pool1 = Pool(
 )
 
 pool2 = Pool(
- 
+
     owner_username="test2",
     rate=20.00,
     size="20x50",
@@ -59,7 +59,7 @@ pool2 = Pool(
 )
 
 pool3 = Pool(
- 
+
     owner_username="test3",
     rate=25.00,
     size="20x50",
@@ -69,7 +69,7 @@ pool3 = Pool(
 )
 
 pool4 = Pool(
- 
+
     owner_username="test1",
     rate=10.00,
     size="12x20",
@@ -89,7 +89,7 @@ pool5 = Pool(
 )
 
 pool6 = Pool(
- 
+
     owner_username="test1",
     rate=10.00,
     size="24x40",
@@ -119,7 +119,7 @@ pool8 = Pool(
 )
 
 pool9 = Pool(
- 
+
     owner_username="test2",
     rate=20.00,
     size="15x30",
@@ -129,7 +129,7 @@ pool9 = Pool(
 )
 
 pool10 = Pool(
- 
+
     owner_username="test2",
     rate=20.00,
     size="15x30",
@@ -161,7 +161,6 @@ db.session.commit()
 
 # region reservations#########################
 reservation1 = Reservation(
-    id=1,
     booked_username="test1",
     pool_id=1,
     reservation_date_created="Wed, 01 Feb 2023 12:01:00 GMT",
@@ -170,7 +169,6 @@ reservation1 = Reservation(
 )
 
 reservation2 = Reservation(
-    id=2,
     booked_username="test2",
     pool_id=2,
     reservation_date_created="Wed, 08 Feb 2023 12:01:00 GMT",
@@ -185,7 +183,6 @@ db.session.commit()
 # region messages#########################
 
 message1 = Message(
-    id=1,
     sender_username="test1",
     recipient_username="test2",
     title="is your pool available?",
@@ -195,7 +192,6 @@ message1 = Message(
 )
 
 message2 = Message(
-    id=2,
     sender_username="test2",
     recipient_username="test1",
     title="I love your pool!",
@@ -205,7 +201,6 @@ message2 = Message(
 )
 
 message3 = Message(
-    id=3,
     sender_username="test1",
     recipient_username="test2",
     title="Great! Come through!",

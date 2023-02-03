@@ -143,7 +143,7 @@ class Message(db.Model):
     # text
     title = db.Column(
         db.Text,
-        nullable=False,
+        # nullable=False,
     )
     # text
     body = db.Column(
