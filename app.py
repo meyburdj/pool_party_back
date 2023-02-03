@@ -396,7 +396,7 @@ def list_messages():
                        .order_by(Message.timestamp.desc()))
     serialized_outbox = [message.serialize() for message in messages_outbox]
 
-    response = {"inbox": serialized_inbox, "outbox": serialized_outbox}
+    response = {"messages" : {"inbox": serialized_inbox, "outbox": serialized_outbox}}
     return response
 
 
