@@ -206,6 +206,7 @@ def show_pool_by_city(city):
     Returns JSON like:
         {pool: owner_username, rate, size, description, address}
     """
+    
     pools = Pool.query.filter(Pool.city == city)
     serialized = [pool.serialize() for pool in pools]
 
