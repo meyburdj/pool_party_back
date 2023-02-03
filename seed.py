@@ -12,6 +12,7 @@ user1 = User(
     username="test1",
     password="pasword",
     location="Los Angeles",
+    image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/brooke-cagle-R0Ea06wC2IM-unsplash.jpg"
 )
 
 user2 = User(
@@ -19,6 +20,7 @@ user2 = User(
     username="test2",
     password="password2",
     location="San Francisco",
+    image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/jake-nackos-IF9TK5Uy-KI-unsplash.jpg"
 )
 
 user3 = User(
@@ -26,33 +28,11 @@ user3 = User(
     username="test3",
     password="password3",
     location="New York",
+    image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/joseph-gonzalez-iFgRcqHznqg-unsplash.jpg"
 )
 
 
 db.session.add_all([user1, user2, user3])
-db.session.commit()
-# endregion
-
-
-# region user Images#########################
-user1Image = UserImage(
-    id=1,
-    username="test1",
-    image_path="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/brooke-cagle-R0Ea06wC2IM-unsplash.jpg"
-)
-user2Image = UserImage(
-    id=1,
-    username="test2",
-    image_path="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/jake-nackos-IF9TK5Uy-KI-unsplash.jpg"
-)
-
-user3Image = UserImage(
-    id=1,
-    username="test3",
-    image_path="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/joseph-gonzalez-iFgRcqHznqg-unsplash.jpg"
-)
-
-db.session.add_all([user1Image, user2Image])
 db.session.commit()
 # endregion
 
