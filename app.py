@@ -263,13 +263,15 @@ def create_pool():
     Returns JSON like:
         {pool: {id, owner_id, rate, size, description, address, image_url}}
     """
-
+    print("I'm in api/pools")
     current_user = get_jwt_identity()
     if current_user:
         try:
             form=request.form
-
+            print("current_user", current_user)
+            print("form", form)
             file = request.files.get('file')
+            print("file", file)
             url=None
             if(file):
                 url = upload_to_aws(file)

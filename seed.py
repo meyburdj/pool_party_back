@@ -39,7 +39,7 @@ db.session.commit()
 
 # region pools#########################
 pool1 = Pool(
-    id=1,
+ 
     owner_username="test1",
     rate=10.00,
     size="20x20",
@@ -49,7 +49,7 @@ pool1 = Pool(
 )
 
 pool2 = Pool(
-    id=2,
+ 
     owner_username="test2",
     rate=20.00,
     size="20x50",
@@ -59,7 +59,7 @@ pool2 = Pool(
 )
 
 pool3 = Pool(
-    id=3,
+ 
     owner_username="test3",
     rate=25.00,
     size="20x50",
@@ -69,7 +69,7 @@ pool3 = Pool(
 )
 
 pool4 = Pool(
-    id=4,
+ 
     owner_username="test1",
     rate=10.00,
     size="12x20",
@@ -79,7 +79,7 @@ pool4 = Pool(
 )
 
 pool5 = Pool(
-    id=5,
+
     owner_username="test3",
     rate=15.00,
     size="24x40",
@@ -89,7 +89,7 @@ pool5 = Pool(
 )
 
 pool6 = Pool(
-    id=5,
+ 
     owner_username="test1",
     rate=10.00,
     size="24x40",
@@ -99,46 +99,46 @@ pool6 = Pool(
 )
 
 pool7 = Pool(
-    id=5,
+
     owner_username="test1",
     rate=12.00,
-    size="=15x30",
+    size="15x30",
     description="A Backyard Paradise!",
     city="Los Angeles",
     image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/xavi-serra-NF93JnqD1Fo-unsplash.jpg"
 )
 
 pool8 = Pool(
-    id=5,
+
     owner_username="test2",
     rate=20.00,
-    size="=15x30",
+    size="15x30",
     description="Pool on the golf course!",
     city="Los Angeles",
     image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/nick-nolan-8w1JRVzx0sw-unsplash.jpg"
 )
 
 pool9 = Pool(
-    id=5,
+ 
     owner_username="test2",
     rate=20.00,
-    size="=15x30",
+    size="15x30",
     description="A pool fit for royalty!",
     city="Los Angeles",
     image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/avi-werde-hHz4yrvxwlA-unsplash.jpg"
 )
 
 pool10 = Pool(
-    id=5,
+ 
     owner_username="test2",
     rate=20.00,
-    size="=15x30",
+    size="15x30",
     description="Treat yoself!",
     city="Los Angeles",
     image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/thor-schroeder-T91WhuBxDec-unsplash.jpg"
 )
 
-db.session.add_all([pool1, pool2, pool3, pool4, pool5, pool6, pool7])
+db.session.add_all([pool1, pool2, pool3, pool4, pool5, pool6, pool7, pool8, pool9, pool10])
 db.session.commit()
 # endregion
 
