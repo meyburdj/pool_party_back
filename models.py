@@ -211,7 +211,12 @@ class Pool(db.Model):
         nullable=False,
     )
 
-    address = db.Column(
+    city = db.Column(
+        db.Text,
+        nullable=False,
+    )
+
+    image_url = db.Column(
         db.Text,
         nullable=False,
     )
@@ -225,7 +230,8 @@ class Pool(db.Model):
             "rate" : self.rate,
             "size" : self.size,
             "description" : self.description,
-            "address" : self.address,
+            "city" : self.city,
+            "image_url": self.image_url
         }
 
 

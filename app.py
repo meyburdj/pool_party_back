@@ -199,6 +199,36 @@ def show_pool(pool_id):
 
     return jsonify(pool=pool)
 
+# @app.post("/api/pools")
+# @jwt_required()
+# def create_pool():
+#     """Add pool, and return data about new pool.
+
+#     Returns JSON like:
+#         {pool: {id, owner_id, rate, size, description, address, image_url}}
+#     """
+
+#     current_user = get_jwt_identity()
+#     if current_user:
+#         data = request.json
+#         print("data", data)
+#         pool = Pool(
+#             owner_username=current_user,
+#             rate=data['rate'],
+#             size=data['size'],
+#             description=data['description'],
+#             city=data['city'],
+#             image_url=data['image_url']
+#         )
+
+#         db.session.add(pool)
+#         db.session.commit()
+
+#         # POST requests should return HTTP status of 201 CREATED
+#         return (jsonify(pool=pool.serialize()), 201)
+
+#     return (jsonify({"error": "not authorized"}), 401)
+
 @app.post("/api/pools")
 @jwt_required()
 def create_pool():
@@ -210,23 +240,30 @@ def create_pool():
 
     current_user = get_jwt_identity()
     if current_user:
-        data = request.json
-        print("data", data)
-        pool = Pool(
-            owner_username=current_user,
-            rate=data['rate'],
-            size=data['size'],
-            description=data['description'],
-            address=data['address']
-        )
+        try:
+            form=request.form
 
-        db.session.add(pool)
-        db.session.commit()
+            file = request.files.get('file')
+            url=None
+            if(file):
+                url = upload_to_aws(file)
 
-        # POST requests should return HTTP status of 201 CREATED
-        return (jsonify(pool=pool.serialize()), 201)
+            pool = Pool(
+                owner_username=current_user,
+                rate=form['rate'],
+                size=form['size'],
+                description=form['description'],
+                city=form['city'],
+                image_url=url
+            )
 
-    return (jsonify({"error": "not authorized"}), 401)
+            db.session.add(pool)
+            db.session.commit()
+
+            return (jsonify(pool=pool.serialize()), 201)
+        except Exception as error:
+            print("Error", error)
+            return (jsonify({"error": "Failed to add pool"}), 401)
 
 
 @app.patch('/api/pools/<int:pool_id>')
