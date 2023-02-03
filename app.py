@@ -171,6 +171,19 @@ def delete_user(username):
     return (jsonify({"error": "not authorized"}), 401)
 
 
+@app.get('/api/users/<username>/pools')
+def list_pools_of_user(username):
+    """Show pools of logged in user.
+
+    Returns JSON like:
+        {pools: {id, owner_id, rate, size, description, address, image_url}, ...}
+    """
+    pools = Pool.query.filter(Pool.owner_username == username)
+    serialized = [pool.serialize() for pool in pools]
+
+    return jsonify(pools=serialized)
+
+
 ################################################################################
 ######################## POOLS ENDPOINTS START #################################
 
@@ -206,7 +219,7 @@ def show_pool_by_city(city):
     Returns JSON like:
         {pool: owner_username, rate, size, description, address}
     """
-    
+
     pools = Pool.query.filter(Pool.city == city)
     serialized = [pool.serialize() for pool in pools]
 
