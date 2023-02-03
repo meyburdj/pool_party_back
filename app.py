@@ -48,9 +48,9 @@ def login():
     password = data['password']
 
     user = User.authenticate(username, password)
-    access_token = create_access_token(identity=user.username)
+    token = create_access_token(identity=user.username)
 
-    return jsonify(access_token=access_token)
+    return jsonify(token=token)
 
 
 @app.post("/api/auth/signup")
