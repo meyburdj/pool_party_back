@@ -12,7 +12,7 @@ user1 = User(
     username="test1",
     password="pasword",
     location="Los Angeles",
-    image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/brooke-cagle-R0Ea06wC2IM-unsplash.jpg"
+    image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/brooke-cagle-R0Ea06wC2IM-unsplash.jpg",
 )
 
 user2 = User(
@@ -20,7 +20,7 @@ user2 = User(
     username="test2",
     password="password2",
     location="San Francisco",
-    image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/jake-nackos-IF9TK5Uy-KI-unsplash.jpg"
+    image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/jake-nackos-IF9TK5Uy-KI-unsplash.jpg",
 )
 
 user3 = User(
@@ -28,7 +28,7 @@ user3 = User(
     username="test3",
     password="password3",
     location="New York",
-    image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/joseph-gonzalez-iFgRcqHznqg-unsplash.jpg"
+    image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/joseph-gonzalez-iFgRcqHznqg-unsplash.jpg",
 )
 
 
@@ -45,7 +45,8 @@ pool1 = Pool(
     size="20x20",
     description="The best pool ever!",
     city="Los Angeles",
-    image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/big-tiny-belly-XtnNrQYC7ts-unsplash.jpg"
+    orig_image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/big-tiny-belly-XtnNrQYC7ts-unsplash.jpg",
+    small_image_url="https://sharebnb-gmm-small-images.s3.us-west-1.amazonaws.com/big-tiny-belly-XtnNrQYC7ts-unsplash-small.jpg"
 )
 
 pool2 = Pool(
@@ -55,7 +56,8 @@ pool2 = Pool(
     size="20x50",
     description="The pool with the best view!",
     city="San Francisco",
-    image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/joe-ciciarelli-08AJKJf75kw-unsplash.jpg"
+    orig_image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/joe-ciciarelli-08AJKJf75kw-unsplash.jpg",
+    small_image_url="https://sharebnb-gmm-small-images.s3.us-west-1.amazonaws.com/joe-ciciarelli-08AJKJf75kw-unsplash-small.jpg"
 )
 
 pool3 = Pool(
@@ -65,7 +67,8 @@ pool3 = Pool(
     size="20x50",
     description="Its heated!!",
     city="New York",
-    image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/john-fornander-y3_AHHrxUBY-unsplash.jpg"
+    orig_image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/john-fornander-y3_AHHrxUBY-unsplash.jpg",
+    small_image_url="https://sharebnb-gmm-small-images.s3.us-west-1.amazonaws.com/john-fornander-y3_AHHrxUBY-unsplash-small.jpg"
 )
 
 pool4 = Pool(
@@ -75,7 +78,8 @@ pool4 = Pool(
     size="12x20",
     description="Small but quaint",
     city="San Francisco",
-    image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/florian-schmidinger-b_79nOqf95I-unsplash.jpg"
+    orig_image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/florian-schmidinger-b_79nOqf95I-unsplash.jpg",
+    small_image_url="https://sharebnb-gmm-small-images.s3.us-west-1.amazonaws.com/florian-schmidinger-b_79nOqf95I-unsplash-small.jpg"
 )
 
 pool5 = Pool(
@@ -85,7 +89,8 @@ pool5 = Pool(
     size="24x40",
     description="High rise and private!",
     city="New York",
-    image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/jerome-pcuVPWxddLI-unsplash.jpg"
+    orig_image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/jerome-pcuVPWxddLI-unsplash.jpg",
+    small_image_url="https://sharebnb-gmm-small-images.s3.us-west-1.amazonaws.com/jerome-pcuVPWxddLI-unsplash-small.jpg"
 )
 
 pool6 = Pool(
@@ -95,7 +100,8 @@ pool6 = Pool(
     size="24x40",
     description="Small but quaint",
     city="New York",
-    image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/ferdinand-asakome-oUdt2BJrLJE-unsplash.jpg"
+    orig_image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/ferdinand-asakome-oUdt2BJrLJE-unsplash.jpg",
+    small_image_url="https://sharebnb-gmm-small-images.s3.us-west-1.amazonaws.com/ferdinand-asakome-oUdt2BJrLJE-unsplash-small.jpg"
 )
 
 pool7 = Pool(
@@ -105,7 +111,8 @@ pool7 = Pool(
     size="15x30",
     description="A Backyard Paradise!",
     city="Los Angeles",
-    image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/xavi-serra-NF93JnqD1Fo-unsplash.jpg"
+    orig_image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/xavi-serra-NF93JnqD1Fo-unsplash.jpg",
+    small_image_url="https://sharebnb-gmm-small-images.s3.us-west-1.amazonaws.com/xavi-serra-NF93JnqD1Fo-unsplash-small.jpg"
 )
 
 pool8 = Pool(
@@ -115,7 +122,8 @@ pool8 = Pool(
     size="15x30",
     description="Pool on the golf course!",
     city="Los Angeles",
-    image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/nick-nolan-8w1JRVzx0sw-unsplash.jpg"
+    orig_image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/nick-nolan-8w1JRVzx0sw-unsplash.jpg",
+    small_image_url="https://sharebnb-gmm-small-images.s3.us-west-1.amazonaws.com/nick-nolan-8w1JRVzx0sw-unsplash-small.jpg"
 )
 
 pool9 = Pool(
@@ -125,7 +133,8 @@ pool9 = Pool(
     size="15x30",
     description="A pool fit for royalty!",
     city="Los Angeles",
-    image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/avi-werde-hHz4yrvxwlA-unsplash.jpg"
+    orig_image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/avi-werde-hHz4yrvxwlA-unsplash.jpg",
+    small_image_url="https://sharebnb-gmm-small-images.s3.us-west-1.amazonaws.com/avi-werde-hHz4yrvxwlA-unsplash-small.jpg"
 )
 
 pool10 = Pool(
@@ -135,7 +144,8 @@ pool10 = Pool(
     size="15x30",
     description="Treat yoself!",
     city="Los Angeles",
-    image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/thor-schroeder-T91WhuBxDec-unsplash.jpg"
+    orig_image_url="https://sharebnb-gmm.s3.us-west-1.amazonaws.com/thor-schroeder-T91WhuBxDec-unsplash.jpg",
+    small_image_url="https://sharebnb-gmm-small-images.s3.us-west-1.amazonaws.com/thor-schroeder-T91WhuBxDec-unsplash-small.jpg"
 )
 
 db.session.add_all([pool1, pool2, pool3, pool4, pool5, pool6, pool7, pool8, pool9, pool10])
@@ -146,13 +156,13 @@ db.session.commit()
 # pool1Image = PoolImage(
 #     id=1,
 #     pool_owner="test1",
-#     image_url="",
+#     orig_orig_image_url="",
 # )
 
 # pool2Image = PoolImage(
 #     id=2,
 #     pool_owner="test2",
-#     image_url="",
+#     orig_orig_image_url="",
 # )
 
 # db.session.add_all([pool1Image, pool2Image])

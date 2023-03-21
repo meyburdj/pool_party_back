@@ -216,7 +216,12 @@ class Pool(db.Model):
         nullable=False,
     )
 
-    image_url = db.Column(
+    orig_image_url = db.Column(
+        db.Text,
+        nullable=False,
+    )
+
+    small_image_url = db.Column(
         db.Text,
         nullable=False,
     )
@@ -231,7 +236,8 @@ class Pool(db.Model):
             "size" : self.size,
             "description" : self.description,
             "city" : self.city,
-            "image_url": self.image_url
+            "orig_image_url": self.orig_image_url,
+            "small_image_url": self.small_image_url
         }
 
 
