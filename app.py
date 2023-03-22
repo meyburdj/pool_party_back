@@ -68,7 +68,7 @@ def create_user():
         file = request.files.get('file')
         url = None
         if (file):
-            url = upload_to_aws(file)
+            [url] = upload_to_aws(file) # TODO: refactor to account for [orig_size_img, small_size_img]
             # print("url", url)
             # print("request.form.get('text')", request.form.get('text'))
             # print("request.form['text']", request.form['text'])
@@ -192,7 +192,7 @@ def list_pools():
     """Return all pools in system.
 
     Returns JSON like:
-        {pools: {id, owner_id, rate, size, description, address, image_url}, ...}
+        {pools: {id, owner_id, rate, size, description, address, small_image_url}, ...}
     """
     pools = Pool.query.all()
 
@@ -244,7 +244,7 @@ def show_pool_by_city(city):
 #             size=data['size'],
 #             description=data['description'],
 #             city=data['city'],
-#             image_url=data['image_url']
+#             orig_image_url=data['orig_image_url']
 #         )
 
 #         db.session.add(pool)
@@ -261,7 +261,7 @@ def create_pool():
     """Add pool, and return data about new pool.
 
     Returns JSON like:
-        {pool: {id, owner_id, rate, size, description, address, image_url}}
+        {pool: {id, owner_id, rate, size, description, address, orig_image_url, small_image_url}}
     """
     print("I'm in api/pools")
     current_user = get_jwt_identity()
@@ -272,9 +272,9 @@ def create_pool():
             print("form", form)
             file = request.files.get('file')
             print("file", file)
-            url=None
+            orig_url=None
             if(file):
-                url = upload_to_aws(file)
+                [orig_url, small_url] = upload_to_aws(file)
 
             pool = Pool(
                 owner_username=current_user,
@@ -282,7 +282,8 @@ def create_pool():
                 size=form['size'],
                 description=form['description'],
                 city=form['city'],
-                image_url=url
+                orig_image_url=orig_url,
+                small_image_url=small_url
             )
 
             db.session.add(pool)
@@ -360,7 +361,7 @@ def add_pool_image(pool_id):
     pool = Pool.query.get_or_404(pool_id)
     if current_user == pool.owner_username:
         file = request.files['file']
-        url = upload_to_aws(file)
+        url = upload_to_aws(file) # TODO: refactor to account for [orig_size_img, small_size_img]
 
         pool_image = PoolImage(
             pool_owner=current_user,
