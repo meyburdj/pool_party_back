@@ -1,6 +1,7 @@
 import unittest
 from app import app, db
 from models import User, Message
+from sqlalchemy.orm import Session
 
 class TestMessageModel(unittest.TestCase):
 
@@ -140,8 +141,7 @@ class TestMessageModel(unittest.TestCase):
         db.session.commit()
         
         # Ensure that the message was deleted successfully
-        self.assertIsNone(Message.query.get(message.id))
-
+        self.assertIsNone(db.session.get(Message, message.id))
 
 if __name__ == "__main__":
     unittest.main()
