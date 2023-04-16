@@ -38,7 +38,6 @@ connect_db(app)
 db.create_all()
 
 #######################  AUTH ENDPOINTS START  ################################
-
 @app.route("/api/auth/login", methods=["POST"])
 def login():
     """ Login user, returns JWT if authenticated """
@@ -48,9 +47,12 @@ def login():
     password = data['password']
 
     user = User.authenticate(username, password)
-    token = create_access_token(identity=user.username)
 
-    return jsonify(token=token)
+    if user:
+        token = create_access_token(identity=user.username)
+        return jsonify(token=token)
+    else:
+        return jsonify({"error": "Invalid credentials"}), 401
 
 
 @app.post("/api/auth/signup")
