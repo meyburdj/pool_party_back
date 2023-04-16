@@ -287,6 +287,7 @@ def create_pool():
                 orig_image_url=orig_url,
                 small_image_url=small_url
             )
+            print("I made it out of pool")
 
             db.session.add(pool)
             db.session.commit()

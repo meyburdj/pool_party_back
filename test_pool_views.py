@@ -3,6 +3,11 @@ import json
 from app import app
 from models import db, User, Pool
 from flask_jwt_extended import create_access_token
+from werkzeug.datastructures import FileStorage
+from unittest.mock import patch, MagicMock
+from io import BytesIO
+from PIL import Image
+
 
 
 
@@ -57,11 +62,8 @@ class PoolViewsTestCase(unittest.TestCase):
         )
         return response
 
-    # def get_jwt_token(self, username):
-    #     access_token = create_access_token(identity=username)
-    #     return access_token
-
-    def test_create_pool(self):
+    @patch('api_helpers.upload_to_aws', return_value=('https://example.com/orig_image.jpg', 'https://example.com/small_image.jpg'))
+    def test_create_pool(self, _):
         user2 = User.signup("testuser2", "test2@test.com", "password", "Test City2")
         db.session.add(user2)
         db.session.commit()
@@ -69,21 +71,31 @@ class PoolViewsTestCase(unittest.TestCase):
         with self.client as client:
             access_token2 = create_access_token(identity="testuser2")
             headers = {"Authorization": f"Bearer {access_token2}"}
+
+            # Create a simple RGB image
+            img = Image.new('RGB', (100, 100), color='red')
+            file_data = BytesIO()
+            img.save(file_data, 'JPEG')
+            file_data.name = 'test_file.jpg'
+            file_data.seek(0)
+
+            # Send the request with the image
             response = client.post(
                 "/api/pools",
+                content_type='multipart/form-data',
+                headers=headers,
                 data={
+                    "file": (file_data, file_data.name),
                     "rate": 200,
                     "size": "2000 sqft",
                     "description": "Test pool 2",
                     "city": "Test City 2"
                 },
-                headers=headers,
             )
 
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 201)
         self.assertTrue("pool" in data)
-
 
         
     def test_update_pool(self):
