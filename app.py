@@ -426,21 +426,43 @@ def create_message():
     return (jsonify(message=message.serialize()), 201)
 
 
+# @app.get("/api/messages/<message_id>")
+# @jwt_required()
+# def show_message(message_id):
+#     """ Show specific message """
+
+#     current_user = get_jwt_identity()
+    
+#     message = Message.query.get_or_404(message_id)
+
+#     if current_user != message.sender_username and current_user != message.recipient_username:
+#         return jsonify({"error": "Unauthorized"}), 401
+
+#     if ((message.sender_username == current_user) or
+#         (message.recipient_username == current_user)):
+#         message = message.serialize()
+#         return jsonify(message=message)
+#     else:
+#         return (jsonify({"error": "not authorized"}), 401)
+    
 @app.get("/api/messages/<message_id>")
-@jwt_required
+@jwt_required()
 def show_message(message_id):
     """ Show specific message """
 
     current_user = get_jwt_identity()
+    
+    message = Message.query.get_or_404(message_id)
 
-    message = User.query.get_404(message_id)
+    print(f"Current user: {current_user}, Sender: {message.sender_username}, Recipient: {message.recipient_username}")
 
-    if ((message.sender_username == current_user) or
-        (message.recipient_username == current_user)):
-        message = message.serialize()
-        return jsonify(message=message)
-    else:
-        return (jsonify({"error": "not authorized"}), 401)
+    if current_user != message.sender_username and current_user != message.recipient_username:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    message = message.serialize()
+    return jsonify(message=message)
+
+
 
 
 
