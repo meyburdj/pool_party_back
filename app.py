@@ -415,7 +415,7 @@ def create_message():
     message = Message(
         sender_username=current_user,
         recipient_username=data['recipient_username'],
-        title=data['title'],
+        title=data.get('title', None),
         body=data['body'],
         listing=data['listing'],
     )

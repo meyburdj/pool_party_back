@@ -10,7 +10,7 @@ class MessagesViewsTestCase(unittest.TestCase):
     def setUp(self):
         app.config["TESTING"] = True
         app.config["DEBUG"] = False
-        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
+        app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///sharebnb_test"
         self.client = app.test_client()
 
         db.create_all()
