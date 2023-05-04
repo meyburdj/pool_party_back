@@ -55,24 +55,50 @@ def upload_to_aws(file):
     return [orig_image_url, small_image_url]
 
 
+# def resize_image(file):
+#     """ Resizes image to height of 140 and sizes width proportionally"""
+
+#     img = Image.open(file)
+
+#     try:
+#         orig_height = int(img.height)
+#         orig_width = int(img.width)
+#         orig_height_to_140_ratio = orig_height / 140
+#         new_height = 140
+
+#         new_width = int(orig_width / orig_height_to_140_ratio)
+
+#         new_image_size = (new_width, new_height)
+#         resized_img = img.resize(
+#             new_image_size, resample=Image.Resampling.BICUBIC)
+#         in_mem_file = io.BytesIO()
+#         resized_img.save(in_mem_file, format=img.format)
+
+#         in_mem_file.seek(0)
+#         img.close()
+
+#         return in_mem_file
+#     except Exception as e:
+#         print("failing at resize_image with error: ", e)
+#         traceback.print_exc()
+
 def resize_image(file):
-    """ Resizes image to height of 140 and sizes width proportionally"""
+    """ Resizes image to height of 280 and sizes width proportionally"""
 
     img = Image.open(file)
 
     try:
         orig_height = int(img.height)
         orig_width = int(img.width)
-        orig_height_to_140_ratio = orig_height / 140
-        new_height = 140
+        orig_height_to_280_ratio = orig_height / 280
+        new_height = 280
 
-        new_width = int(orig_width / orig_height_to_140_ratio)
+        new_width = int(orig_width / orig_height_to_280_ratio)
 
         new_image_size = (new_width, new_height)
-        resized_img = img.resize(
-            new_image_size, resample=Image.Resampling.BICUBIC)
+        resized_img = img.resize(new_image_size, resample=Image.Resampling.LANCZOS)
         in_mem_file = io.BytesIO()
-        resized_img.save(in_mem_file, format=img.format)
+        resized_img.save(in_mem_file, format=img.format, quality=85)
 
         in_mem_file.seek(0)
         img.close()
@@ -81,6 +107,7 @@ def resize_image(file):
     except Exception as e:
         print("failing at resize_image with error: ", e)
         traceback.print_exc()
+
 
 
 def make_thumbnail(file):
