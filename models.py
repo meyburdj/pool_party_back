@@ -269,11 +269,11 @@ class Reservation(db.Model):
 
     start_date = db.Column(
         db.DateTime,
-        nullable=False,
+        nullable=True,
     )
     end_date = db.Column(
         db.DateTime,
-        nullable=False,
+        nullable=True,
     )
 
     def serialize(self):

@@ -483,13 +483,13 @@ def create_reservation(pool_id):
         reservation = Reservation(
             booked_username=current_user,
             pool_id=pool_id,
-            start_date=data['start_date'],
-            end_date=data['end_date']
+            start_date=data.get('start_date', None),
+            end_date=data.get('end_date', None)                                        
         )
 
         db.session.add(reservation)
         db.session.commit()
-
+        print(reservation.serialize())
         return (jsonify(reservation=reservation.serialize()), 201)
 
     return (jsonify({"error": "not authorized"}), 401)
@@ -525,9 +525,9 @@ def get_booked_reservations_for_username(username):
     current_user = get_jwt_identity()
 
     user = User.query.get_or_404(username)
-    if(user.username==current_user):
+    if(user.username == current_user):
         reservations = (Reservation.query
-        .filter(username=username)
+        .filter(Reservation.booked_username == username)
         .order_by(Reservation.start_date.desc()))
 
         serialized_reservations = ([reservation.serialize()
@@ -537,6 +537,7 @@ def get_booked_reservations_for_username(username):
 
     #TODO: better error handling for more diverse errors
     return (jsonify({"error": "not authorized"}), 401)
+
 
 
 @app.get("/api/reservations/<int:reservation_id>")
@@ -569,9 +570,9 @@ def delete_booked_reservation(reservation_id):
 
     current_user = get_jwt_identity()
 
-    reservation = Reservation.get_or_404(reservation_id)
+    reservation = Reservation.query.get_or_404(reservation_id)
     pool_id = reservation.pool_id
-    pool = Pool.get_or_404(pool_id)
+    pool = Pool.query.get_or_404(pool_id)
 
     if ((reservation.booked_username == current_user) or
         (pool.owner_username == current_user)):
