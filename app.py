@@ -99,6 +99,7 @@ def create_user():
 
     except Exception as error:
         print("Error", error)
+        db.session.rollback()
         return (jsonify({"error": "Failed to signup"}), 424)
 
 
@@ -295,6 +296,7 @@ def create_pool():
             return (jsonify(pool=pool.serialize()), 201)
         except Exception as error:
             print("Error", error)
+            db.session.rollback()
             return (jsonify({"error": "Failed to add pool"}), 401)
 
 
